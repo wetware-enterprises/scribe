@@ -1,0 +1,3 @@
+[submodule "Scribe.Scanner/sigscanner"]
+	path = Scribe.Scanner/sigscanner
+	url = git@github.com:chirpxiv/sigscanner.git
