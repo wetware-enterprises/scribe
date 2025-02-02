@@ -22,8 +22,6 @@ public class StateWatcher {
 	public bool IsEnteringHardline { get; set; }
 
 	public event Action<StateWatcher>? OnProcessed; 
-	
-	//public bool IsInputMode => this
 
 	public StateWatcher(MemoryReader reader) {
 		this._reader = reader;

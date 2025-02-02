@@ -11,7 +11,8 @@ public class InputManager {
 	}
 
 	public void SendKey(char key) {
-		User32.SendMessage(this._proc.MainWindowHandle, 0x0102, key, 0);
+		const uint wmChar = 0x102;
+		User32.SendMessage(this._proc.MainWindowHandle, wmChar, key, 0);
 	}
 	
 	public void SendKey(VirtualKey key) {
