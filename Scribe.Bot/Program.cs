@@ -14,4 +14,6 @@ client.State.Kernel.OnChanged += kernel => {
 	client.Input.SendText(kernel.HardlineDigits);
 };
 
+client.Initialize();
+
 Console.ReadLine();
