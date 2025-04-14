@@ -61,7 +61,7 @@ public class GameClient : IDisposable {
 			this._isEnabled = true;
 			this._cts = cts;
 		}
-		this.Update(this._cts.Token).ContinueWith(task => {
+		this.Update(cts.Token).ContinueWith(task => {
 			if (task.Exception == null) return;
 			this.OnError?.Invoke(task.Exception);
 			this.Disable();
