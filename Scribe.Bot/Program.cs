@@ -1,9 +1,7 @@
-﻿using Scribe.Core;
-using Scribe.Hackmud;
+﻿using Scribe.Hackmud;
 using Scribe.Hackmud.Game.Enums;
 
-var proc = ProcResolver.Resolve();
-var client = new GameClientBuilder(proc).Build();
+var client = new GameClientBuilder().Build();
 
 // todo: everything else
 client.State.Kernel.OnChanged += kernel => {

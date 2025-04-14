@@ -6,15 +6,15 @@ using Scribe.Hackmud.State;
 namespace Scribe.Hackmud;
 
 public sealed class GameClientBuilder {
-	private readonly GameProcess _proc;
-	
-	public GameClientBuilder(
-		GameProcess proc
-	) {
+	private GameProcess? _proc;
+
+	public GameClientBuilder WithProcess(GameProcess proc) {
 		this._proc = proc;
+		return this;
 	}
 
 	public GameClient Build() {
+		this._proc ??= ProcResolver.Resolve();
 		var reader = this._proc.OpenReader();
 		var state = new StateWatcher(reader);
 		var input = new InputManager(this._proc);
