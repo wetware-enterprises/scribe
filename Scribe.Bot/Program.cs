@@ -12,6 +12,10 @@ client.State.Kernel.OnChanged += kernel => {
 	client.Input.SendText(kernel.HardlineDigits);
 };
 
+client.OnError += error => {
+	Console.WriteLine($"Error: {error}");
+};
+
 client.Initialize();
 
 Console.ReadLine();

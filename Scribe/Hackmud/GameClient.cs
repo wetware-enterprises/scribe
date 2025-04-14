@@ -13,8 +13,7 @@ public class GameClient : IDisposable {
 	public readonly StateWatcher State;
 	public readonly InputManager Input;
 	public readonly ScriptScheduler Scheduler;
-
-	private Task? _task;
+	
 	private CancellationTokenSource? _cts;
 	
 	private bool _isEnabled;
@@ -45,6 +44,8 @@ public class GameClient : IDisposable {
 		}
 	}
 
+	public event Action<Exception>? OnError; 
+
 	public void Initialize() {
 		this.State.Initialize();
 		this.Scheduler.Initialize();
@@ -54,23 +55,32 @@ public class GameClient : IDisposable {
 	private void Enable() {
 		if (this.Enabled)
 			this.Disable();
-		lock (this._lock)
+
+		var cts = new CancellationTokenSource();
+		lock (this._lock) {
 			this._isEnabled = true;
-		this._cts = new CancellationTokenSource();
-		this._task = this.Update(this._cts.Token);
+			this._cts = cts;
+		}
+		this.Update(this._cts.Token).ContinueWith(task => {
+			if (task.Exception == null) return;
+			this.OnError?.Invoke(task.Exception);
+			this.Disable();
+		}, TaskContinuationOptions.OnlyOnFaulted);
 	}
 
 	private void Disable() {
-		this._cts?.Cancel();
-		this._task?.Dispose();
-		this._task = null;
-		lock (this._lock)
+		lock (this._lock) {
+			if (this._cts is { IsCancellationRequested: false })
+				this._cts.Cancel();
+			this._cts?.Dispose();
 			this._isEnabled = false;
+		}
 	}
 
 	private async Task Update(CancellationToken ct) {
 		while (this.Enabled) {
-			ct.ThrowIfCancellationRequested();
+			lock (this._lock)
+				ct.ThrowIfCancellationRequested();
 			this.State.Update();
 			this.Scheduler.Update();
 			await Task.Delay(1, ct);
@@ -81,5 +91,6 @@ public class GameClient : IDisposable {
 		if (this._isDisposed) return;
 		this.Disable();
 		this._isDisposed = true;
+		GC.SuppressFinalize(this);
 	}
 }
