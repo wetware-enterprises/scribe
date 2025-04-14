@@ -3,18 +3,21 @@ using Scribe.Input;
 using Scribe.Hackmud.Shell;
 using Scribe.Hackmud.State;
 
-using Timer = System.Timers.Timer;
-
 namespace Scribe.Hackmud;
 
 public class GameClient : IDisposable {
 	private readonly GameProcess _proc;
-	private readonly Timer _timer = new();
+	
+	private readonly Lock _lock = new();
 	
 	public readonly StateWatcher State;
 	public readonly InputManager Input;
 	public readonly ScriptScheduler Scheduler;
 
+	private Task? _task;
+	private CancellationTokenSource? _cts;
+	
+	private bool _isEnabled;
 	private bool _isDisposed;
 	
 	public GameClient(
@@ -28,32 +31,55 @@ public class GameClient : IDisposable {
 		this.Input = input;
 		this.Scheduler = scheduler;
 	}
-	
+
 	public bool Enabled {
-		get => !this._isDisposed && this._timer.Enabled;
-		set => this._timer.Enabled = value;
+		get {
+			lock (this._lock)
+				return this._isEnabled;
+		}
+		set {
+			if (value)
+				this.Enable();
+			else
+				this.Disable();
+		}
 	}
 
 	public void Initialize() {
 		this.State.Initialize();
 		this.Scheduler.Initialize();
-		
-		this._timer.Elapsed += this.Update;
-		this._timer.AutoReset = true;
-		this._timer.Interval = 1;
-		this._timer.Start();
+		this.Enable();
 	}
 
-	private void Update(object? sender, object _) {
-		if (!this.Enabled) return;
-		
-		this.State.Update();
-		this.Scheduler.Update();
+	private void Enable() {
+		if (this.Enabled)
+			this.Disable();
+		lock (this._lock)
+			this._isEnabled = true;
+		this._cts = new CancellationTokenSource();
+		this._task = this.Update(this._cts.Token);
+	}
+
+	private void Disable() {
+		this._cts?.Cancel();
+		this._task?.Dispose();
+		this._task = null;
+		lock (this._lock)
+			this._isEnabled = false;
+	}
+
+	private async Task Update(CancellationToken ct) {
+		while (this.Enabled) {
+			ct.ThrowIfCancellationRequested();
+			this.State.Update();
+			this.Scheduler.Update();
+			await Task.Delay(1, ct);
+		}
 	}
 
 	public void Dispose() {
 		if (this._isDisposed) return;
-		this._timer.Dispose();
+		this.Disable();
 		this._isDisposed = true;
 	}
 }
