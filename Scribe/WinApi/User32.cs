@@ -4,7 +4,7 @@ namespace Scribe.WinApi;
 
 public static class User32 {
 	[DllImport("User32.dll")]
-	public extern static nint SendMessage(nint hWnd, uint msg, nint wParam, nint lParam);
+	public extern static nint PostMessage(nint hWnd, uint msg, nint wParam, nint lParam);
 
 	[DllImport("User32.dll", SetLastError = true)]
 	public extern static nint CreateWindowExW(
