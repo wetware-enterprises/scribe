@@ -53,8 +53,10 @@ public class GameClient : IDisposable {
 	}
 
 	private void Enable() {
-		if (this.Enabled)
-			this.Disable();
+		if (this._isDisposed)
+			throw new Exception("Attempted to enable after disposal.");
+		
+		if (this.Enabled) this.Disable();
 
 		var cts = new CancellationTokenSource();
 		lock (this._lock) {
