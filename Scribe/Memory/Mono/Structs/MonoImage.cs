@@ -1,6 +1,8 @@
 ﻿using System.Runtime.InteropServices;
+
 using Scribe.Memory.Mono.Enums;
 using Scribe.Memory.Mono.Metadata;
+using Scribe.Memory.Reader.Types;
 
 namespace Scribe.Memory.Mono.Structs;
 
@@ -37,19 +39,19 @@ public struct MonoImage {
 		return this.GetTableInfoSpan()[(int)index];
 	}
 
-	public IEnumerable<TypeDefInfo> ReadTypeDefInfo(MemoryReader reader) {
+	public IEnumerable<TypeDefInfo> ReadTypeDefInfo(IMemoryReader reader) {
 		var table = this.GetTableInfo(MonoTable.TypeDef);
 		foreach (var data in table.ReadRows(reader))
 			yield return new TypeDefInfo(data);
 	}
 
-	public MonoClass? FindClassDef(MemoryReader reader, uint handle) {
+	public MonoClass? FindClassDef(IMemoryReader reader, uint handle) {
 		var ptr = this.Classes.GetIndex(handle);
-		if (!reader.ReadIntPtr(ptr, out var cursor))
+		if (!reader.TryReadPtr(ptr, out var cursor))
 			return null;
 		
 		while (cursor != nint.Zero) {
-			if (!reader.Read<MonoClassDef>(cursor, out var def) || !reader.Read<MonoClass>(def.Class, out var defClass))
+			if (!reader.TryRead<MonoClassDef>(cursor, out var def) || !reader.TryRead<MonoClass>(def.Class, out var defClass))
 				break;
 			
 			if (defClass.Handle == handle)

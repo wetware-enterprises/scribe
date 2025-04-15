@@ -6,5 +6,11 @@ namespace Scribe.Memory.Mono.Structs;
 
 [StructLayout(LayoutKind.Explicit)]
 public struct MonoDomain {
-	[FieldOffset(0xA0)] public StdLinkedList<MonoAssembly> Assemblies;
+#if OS_WINDOWS
+	private const int _000 = 0xA0;
+#elif OS_LINUX
+	private const int _000 = 0x98;
+#endif
+	
+	[FieldOffset(_000)] public StdLinkedList<MonoAssembly> Assemblies;
 }

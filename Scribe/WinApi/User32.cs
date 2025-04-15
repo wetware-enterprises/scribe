@@ -2,6 +2,7 @@
 
 namespace Scribe.WinApi;
 
+#if OS_WINDOWS
 public static class User32 {
 	[DllImport("User32.dll")]
 	public extern static nint PostMessage(nint hWnd, uint msg, nint wParam, nint lParam);
@@ -67,3 +68,4 @@ public static class User32 {
 	[DllImport("User32.dll")]
 	public extern static nint DefWindowProc(nint hWnd, uint uMsg, nint wParam, nint lParam);
 }
+#endif

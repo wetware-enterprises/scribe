@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
+using Scribe.Memory.Reader.Types;
+
 namespace Scribe.Memory.Mono.Structs;
 
 [StructLayout(LayoutKind.Explicit, Size = 0x10)]
@@ -12,7 +14,7 @@ public struct MonoTableInfo {
 	public uint GetRowSize() => this.RowCountAndSize >> 24;
 	public uint GetColumns() => this.BitField >> 24;
 
-	public uint[] ReadRow(MemoryReader reader, int row) {
+	public uint[] ReadRow(IMemoryReader reader, int row) {
 		var count = this.GetColumns();
 		var columns = new uint[count];
 		
@@ -20,9 +22,9 @@ public struct MonoTableInfo {
 		for (var i = 0; i < count; i++) {
 			var size = ((this.BitField >> (i * 2)) & 0x3) + 1;
 			columns[i] = size switch {
-				1 => reader.ReadUnchecked<byte>(cursor),
-				2 => reader.ReadUnchecked<ushort>(cursor),
-				4 => reader.ReadUnchecked<uint>(cursor),
+				1 => reader.Read<byte>(cursor),
+				2 => reader.Read<ushort>(cursor),
+				4 => reader.Read<uint>(cursor),
 				_ => throw new Exception($"Invalid column size: ${size}")
 			};
 			cursor += (nint)size;
@@ -31,7 +33,7 @@ public struct MonoTableInfo {
 		return columns;
 	}
 
-	public IEnumerable<uint[]> ReadRows(MemoryReader reader) {
+	public IEnumerable<uint[]> ReadRows(IMemoryReader reader) {
 		var count = this.GetRowCount();
 		for (var i = 0; i < count; i++)
 			yield return this.ReadRow(reader, i);

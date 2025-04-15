@@ -1,11 +1,11 @@
-﻿using Scribe.Memory;
-using Scribe.Hackmud.Game;
+﻿using Scribe.Hackmud.Game;
 using Scribe.Hackmud.Game.Enums;
+using Scribe.Memory.Reader.Types;
 
 namespace Scribe.Hackmud.State;
 
 public class StateWatcher {
-	private readonly MemoryReader _reader;
+	private readonly IMemoryReader _reader;
 
 	public readonly WindowState Window = new();
 	public readonly KernelState Kernel = new();
@@ -23,18 +23,23 @@ public class StateWatcher {
 
 	public event Action<StateWatcher>? OnProcessed; 
 
-	public StateWatcher(MemoryReader reader) {
+	public StateWatcher(IMemoryReader reader) {
 		this._reader = reader;
 	}
 
 	public void Initialize() {
 		var shell = this._reader.GetClass("hackmud", "ShellParsing");
-		this._shellInst = this._reader.FindClassInstance(shell);
+		this._shellInst = this._reader.FindClassInstance(shell, addr =>
+			this._reader.TryRead<ShellParsing>(addr, out var obj)
+				&& obj.Kernel != nint.Zero
+				&& this._reader.TryRead<Kernel>(obj.Kernel, out var kernel)
+				&& kernel.ShellParsing == addr
+		);
 		Console.WriteLine($"Shell: {this._shellInst:X}");
 	}
 
 	public void Update() {
-		if (!this._reader.Read<ShellParsing>(this._shellInst, out var shell))
+		if (!this._reader.TryRead<ShellParsing>(this._shellInst, out var shell))
 			throw new Exception("Could not read ShellParsing instance.");
 
 		var prevCanInput = this.CanInput;

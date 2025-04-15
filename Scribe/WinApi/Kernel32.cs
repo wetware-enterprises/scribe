@@ -2,6 +2,7 @@
 
 namespace Scribe.WinApi;
 
+#if OS_WINDOWS
 public static class Kernel32 {
 	[DllImport("kernel32.dll", SetLastError = true)]
 	public extern static nint OpenProcess(ProcessVmAccess dwDesiredAccess, bool bInheritHandle, int dwProcessId);
@@ -71,3 +72,4 @@ public static class Kernel32 {
 		Image = 0x1000000
 	}
 }
+#endif

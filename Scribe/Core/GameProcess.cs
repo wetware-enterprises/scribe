@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
-using Scribe.Memory;
-using Scribe.WinApi;
+using Scribe.Memory.Reader;
+using Scribe.Memory.Reader.Types;
 
 namespace Scribe.Core;
 
@@ -20,17 +20,6 @@ public class GameProcess {
 		this._process = process;
 		this._mono = mono;
 	}
-
-	public MemoryReader OpenReader() {
-		var hProc = Kernel32.OpenProcess(
-			Kernel32.ProcessVmAccess.Read | Kernel32.ProcessVmAccess.Query,
-			false,
-			this._process.Id
-		);
-
-		if (hProc == nint.Zero)
-			throw new Exception($"Failed to open handle to PID {this._process.Id}");
-
-		return new MemoryReader(hProc, this._mono);
-	}
+	
+	public IMemoryReader OpenReader() => MemoryReader.Open(this._process, this._mono);
 }

@@ -1,10 +1,16 @@
 ﻿using System.Diagnostics;
+using Scribe.Memory.Reader;
 
 namespace Scribe.Core;
 
 public static class ProcResolver {
+	#if OS_WINDOWS
 	private const string GameProcName = "hackmud_win";
 	private const string MonoModuleName = "mono-2.0-bdwgc.dll";
+	#elif OS_LINUX
+	private const string GameProcName = "hackmud_lin.x86_64";
+	private const string MonoModuleName = "libmonobdwgc-2.0.so";
+	#endif
 	
 	public static GameProcess Resolve() {
 		var proc = Process.GetProcessesByName(GameProcName)

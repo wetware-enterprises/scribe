@@ -1,6 +1,7 @@
 ﻿using Scribe.Memory;
 using Scribe.Hackmud.Game;
 using Scribe.Hackmud.Game.Enums;
+using Scribe.Memory.Reader.Types;
 
 namespace Scribe.Hackmud.State;
 
@@ -12,12 +13,12 @@ public sealed class KernelState {
 
 	public event Action<KernelState>? OnChanged; 
 	
-	public void Update(MemoryReader reader, nint ptr) {
+	public void Update(IMemoryReader reader, nint ptr) {
 		var isStateChanged = false;
 		
 		// Kernel
 		
-		if (!reader.Read<Kernel>(ptr, out var kernel))
+		if (!reader.TryRead<Kernel>(ptr, out var kernel))
 			throw new Exception("Could not read Kernel from pointer.");
 
 		isStateChanged |= this.Mode != kernel.CurrentMode;
@@ -25,7 +26,7 @@ public sealed class KernelState {
 
 		// Hardline
 		
-		if (!reader.Read<Hardline>(kernel.Hardline, out var hardline))
+		if (!reader.TryRead<Hardline>(kernel.Hardline, out var hardline))
 			throw new Exception("Could not read Hardline from pointer.");
 
 		var isHardlineChanged = this.HardlineStep != hardline.CurrentStep;

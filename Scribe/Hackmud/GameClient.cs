@@ -14,6 +14,8 @@ public class GameClient : IDisposable {
 	public readonly InputManager Input;
 	public readonly ScriptScheduler Scheduler;
 	
+	public event Action<Exception>? OnError; 
+	
 	private CancellationTokenSource? _cts;
 	
 	private bool _isEnabled;
@@ -43,8 +45,6 @@ public class GameClient : IDisposable {
 				this.Disable();
 		}
 	}
-
-	public event Action<Exception>? OnError; 
 
 	public void Initialize() {
 		this.State.Initialize();
