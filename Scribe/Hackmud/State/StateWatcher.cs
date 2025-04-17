@@ -4,7 +4,7 @@ using Scribe.Memory.Reader.Types;
 
 namespace Scribe.Hackmud.State;
 
-public class StateWatcher {
+public class StateWatcher : IDisposable {
 	private readonly IMemoryReader _reader;
 
 	public readonly WindowState Window = new();
@@ -61,5 +61,12 @@ public class StateWatcher {
 			this.Window.Output.Clear();
 		else
 			this.OnProcessed?.Invoke(this);
+	}
+	
+	// IDisposable
+
+	public void Dispose() {
+		this._reader.Dispose();
+		GC.SuppressFinalize(this);
 	}
 }

@@ -3,7 +3,7 @@ using Scribe.Memory.Mono.Structs;
 
 namespace Scribe.Memory.Reader.Types;
 
-public interface IMemoryReader {
+public interface IMemoryReader : IDisposable {
 	public bool TryReadBuffer(nint address, int size, out byte[] buffer);
 	public bool TryRead<T>(nint address, out T result) where T : unmanaged;
 	public bool TryReadPtr(nint address, out nint result);

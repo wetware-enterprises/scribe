@@ -1,5 +1,4 @@
 ﻿using Scribe.Core;
-using Scribe.Input;
 using Scribe.Hackmud.Shell;
 using Scribe.Hackmud.State;
 using Scribe.Input.Types;
@@ -93,6 +92,8 @@ public class GameClient : IDisposable {
 	public void Dispose() {
 		if (this._isDisposed) return;
 		this.Disable();
+		this.State.Dispose();
+		this.Input.Dispose();
 		this._isDisposed = true;
 		GC.SuppressFinalize(this);
 	}

@@ -159,6 +159,14 @@ public class MemoryReader : MemoryReaderBase, IMemoryReaderImpl {
 		var asmPtr = sigAddr + this.Read<int>(sigAddr + 3) + 7;
 		return this.TryReadPtr(asmPtr, out gDomainPtr);
 	}
+	
+	// IDisposable
+
+	public override void Dispose() {
+		if (!Kernel32.CloseHandle(this._hProcess))
+			Console.WriteLine("Warning: Failed to close process handle!");
+		GC.SuppressFinalize(this);
+	}
 }
 
 #endif

@@ -117,4 +117,8 @@ public abstract class MemoryReaderBase : IMemoryReader {
 			if (monoClass != null) nameSpaceMap.Add(name, monoClass.Value);
 		}
 	}
+	
+	// IDisposable
+
+	public abstract void Dispose();
 }

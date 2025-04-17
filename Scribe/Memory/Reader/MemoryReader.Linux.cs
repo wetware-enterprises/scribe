@@ -93,6 +93,13 @@ public class MemoryReader : MemoryReaderBase, IMemoryReaderImpl {
 		var asmPtr = address + this._fr.ReadInt32() + 7;
 		return this.TryReadPtr(asmPtr, out gDomainPtr);
 	}
+	
+	// IDisposable
+
+	public override void Dispose() {
+		this._fr.Dispose();
+		GC.SuppressFinalize(this);
+	}
 }
 
 #endif
