@@ -1,21 +1,9 @@
-﻿using Scribe.Hackmud;
-using Scribe.Hackmud.Game.Enums;
+﻿using Scribe.Bot;
+using Scribe.Hackmud;
 
 var client = new GameClientBuilder().Build();
 
-// todo: everything else
-client.State.Kernel.OnChanged += kernel => {
-	if (kernel.HardlineStep != HardlineStep.Patching)
-		return;
-	
-	Console.WriteLine($"Digits: {kernel.HardlineDigits}");
-	client.Input.SendText(kernel.HardlineDigits);
-};
-
-client.OnError += error => {
-	Console.WriteLine($"Error: {error}");
-};
-
-client.Initialize();
+using var bot = new ScribeBot(client);
+bot.Initialize();
 
 Console.ReadLine();
