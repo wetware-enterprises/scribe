@@ -11,6 +11,8 @@ public class GameProcess {
 	
 	public bool IsAlive => !this._process.HasExited;
 
+	public int ProcessId => this._process.Id;
+
 	public nint MainWindowHandle => this._process.MainWindowHandle;
 	
 	public GameProcess(

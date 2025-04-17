@@ -1,11 +1,11 @@
-﻿using Scribe.Input;
-using Scribe.Hackmud.State;
+﻿using Scribe.Hackmud.State;
+using Scribe.Input.Types;
 
 namespace Scribe.Hackmud.Shell;
 
 public class ScriptScheduler {
 	private readonly StateWatcher _state;
-	private readonly InputManager _input;
+	private readonly IInputManager _input;
 
 	private readonly Queue<QueuedCommand> _queue = new();
 
@@ -13,7 +13,7 @@ public class ScriptScheduler {
 
 	public ScriptScheduler(
 		StateWatcher state,
-		InputManager input
+		IInputManager input
 	) {
 		this._state = state;
 		this._input = input;

@@ -2,6 +2,7 @@
 using Scribe.Input;
 using Scribe.Hackmud.Shell;
 using Scribe.Hackmud.State;
+using Scribe.Input.Types;
 
 namespace Scribe.Hackmud;
 
@@ -11,7 +12,7 @@ public class GameClient : IDisposable {
 	private readonly Lock _lock = new();
 	
 	public readonly StateWatcher State;
-	public readonly InputManager Input;
+	public readonly IInputManager Input;
 	public readonly ScriptScheduler Scheduler;
 	
 	public event Action<Exception>? OnError; 
@@ -24,7 +25,7 @@ public class GameClient : IDisposable {
 	public GameClient(
 		GameProcess proc,
 		StateWatcher state,
-		InputManager input,
+		IInputManager input,
 		ScriptScheduler scheduler
 	) {
 		this._proc = proc;

@@ -17,7 +17,7 @@ public sealed class GameClientBuilder {
 		this._proc ??= ProcResolver.Resolve();
 		var reader = this._proc.OpenReader();
 		var state = new StateWatcher(reader);
-		var input = new InputManager(this._proc);
+		var input = InputManager.Create(this._proc);
 		var scheduler = new ScriptScheduler(state, input);
 		return new GameClient(this._proc, state, input, scheduler);
 	}

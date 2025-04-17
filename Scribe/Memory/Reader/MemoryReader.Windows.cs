@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 
 using Scribe.Memory.Mono.Structs;
 using Scribe.Memory.Reader.Types;
+using Scribe.Platform.WinApi;
 using Scribe.Scanner;
-using Scribe.WinApi;
 
 namespace Scribe.Memory.Reader;
 

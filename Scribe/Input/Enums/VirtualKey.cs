@@ -1,4 +1,4 @@
-﻿namespace Scribe.Input;
+﻿namespace Scribe.Input.Enums;
 
 public enum VirtualKey {
 	MbLeft = 0x01,

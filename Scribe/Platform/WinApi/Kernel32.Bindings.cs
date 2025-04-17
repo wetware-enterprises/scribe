@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Scribe.WinApi;
+namespace Scribe.Platform.WinApi;
 
 #if OS_WINDOWS
 public static class Kernel32 {
