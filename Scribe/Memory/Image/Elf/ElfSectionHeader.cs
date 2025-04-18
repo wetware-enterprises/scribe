@@ -1,4 +1,4 @@
-﻿namespace Scribe.Memory.Elf;
+﻿namespace Scribe.Memory.Image.Elf;
 
 public record ElfSectionHeader {
 	public uint NameIndex;

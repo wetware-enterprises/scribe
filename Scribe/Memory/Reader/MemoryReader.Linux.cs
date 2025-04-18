@@ -2,10 +2,10 @@
 
 using System.Diagnostics;
 
-using Scribe.Memory.Elf;
 using Scribe.Memory.Map;
 using Scribe.Memory.Mono.Structs;
 using Scribe.Memory.Reader.Types;
+using Scribe.Memory.Image.Elf;
 
 namespace Scribe.Memory.Reader;
 

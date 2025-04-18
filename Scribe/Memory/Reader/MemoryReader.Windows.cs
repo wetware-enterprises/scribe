@@ -3,10 +3,10 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using Scribe.Memory.Image.Pe;
 using Scribe.Memory.Mono.Structs;
 using Scribe.Memory.Reader.Types;
 using Scribe.Platform.WinApi;
-using Scribe.Scanner;
 
 namespace Scribe.Memory.Reader;
 
@@ -122,41 +122,17 @@ public class MemoryReader : MemoryReaderBase, IMemoryReaderImpl {
 		return nint.Zero;
 	}
 
-	protected unsafe override bool TryResolveDomainPtr(out nint gDomainPtr) {
-		const int headerCoffOffset = 0x3C;
-		const int headerCoffSize = 0x18;
-		const int headerSectionSize = 0x28;
-
+	protected override bool TryResolveDomainPtr(out nint gDomainPtr) {
 		var baseAddr = this._mono.BaseAddress;
+		gDomainPtr = nint.Zero;
 		
-		var coffOffset = this.Read<int>(baseAddr + headerCoffOffset);
-		var sectionCt = this.Read<ushort>(baseAddr + coffOffset + 0x06);
-		var optHeaderSize = this.Read<ushort>(baseAddr + coffOffset + 0x14);
-
-		var sectionOffset = coffOffset + headerCoffSize + optHeaderSize;
-		var sectionSize = sectionCt * headerSectionSize;
-
-		if (!this.TryReadBuffer(baseAddr, sectionOffset + sectionSize, out var headerBuf))
-			throw new Exception("Failed to read PE header.");
-
-		nint textBase;
-		byte[] textBuf;
+		var pe = new PeReader(this);
+		if (!pe.TryGetExportDirectory(baseAddr, out var dir))
+			return false;
+		if (!pe.TryGetExportByName(baseAddr, dir, "mono_get_root_domain", out var addr))
+			return false;
 		
-		fixed (void* pHeaderBuf = headerBuf) {
-			var textPtr = SigScanner.LookupSectionName((nint)pHeaderBuf, ".text", out var size);
-			textBase = baseAddr + (textPtr - (nint)pHeaderBuf);
-			if (!this.TryReadBufferCopy(textBase, (int)size, out textBuf))
-				throw new Exception("Failed to read .text section.");
-		}
-
-		nint sigAddr;
-		
-		fixed (void* pTextBuf = textBuf) {
-			var sigPtr = SigScanner.ScanMemory((nint)pTextBuf, textBuf.Length, "48 3B 0D ?? ?? ?? ?? 4C 8B E9");
-			sigAddr = textBase + (sigPtr - (nint)pTextBuf);
-		}
-
-		var asmPtr = sigAddr + this.Read<int>(sigAddr + 3) + 7;
+		var asmPtr = addr + this.Read<int>(addr + 3) + 7;
 		return this.TryReadPtr(asmPtr, out gDomainPtr);
 	}
 	

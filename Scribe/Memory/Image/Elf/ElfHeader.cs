@@ -1,4 +1,4 @@
-﻿namespace Scribe.Memory.Elf;
+﻿namespace Scribe.Memory.Image.Elf;
 
 public record ElfHeader {
 	public uint Magic;

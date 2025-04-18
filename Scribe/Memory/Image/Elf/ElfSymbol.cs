@@ -1,4 +1,4 @@
-﻿namespace Scribe.Memory.Elf;
+﻿namespace Scribe.Memory.Image.Elf;
 
 public record ElfSymbol {
 	public uint NameIndex;

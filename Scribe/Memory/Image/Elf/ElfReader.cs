@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Scribe.Memory.Reader;
 
-namespace Scribe.Memory.Elf;
+namespace Scribe.Memory.Image.Elf;
 
 public class ElfReader(FileReader fr) {
-	public ElfHeader ReadHeader(nint baseAddress) {
+	public ElfHeader ReadHeader(nint baseAddr) {
 		var header = new ElfHeader();
 		
-		fr.Position = baseAddress;
+		fr.Position = baseAddr;
 		header.Magic = fr.ReadUInt32();
 		fr.Seek(0x0C);
 		header.Type = fr.ReadUInt16();
@@ -19,7 +19,7 @@ public class ElfReader(FileReader fr) {
 		header.ShStrIndex = fr.ReadUInt16();
 
 		var sections = this.ReadSections(
-			baseAddress,
+			baseAddr,
 			header.ShOffset,
 			header.ShEntrySize,
 			header.ShNum
@@ -29,7 +29,7 @@ public class ElfReader(FileReader fr) {
 		
 		foreach (var section in sections) {
 			if (section.NameIndex == 0) continue;
-			fr.Position = baseAddress + strTable.Offset + section.NameIndex;
+			fr.Position = baseAddr + strTable.Offset + section.NameIndex;
 			var name = fr.ReadCString();
 			header.Sections.Add(name, section);
 		}

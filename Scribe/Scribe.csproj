@@ -7,10 +7,6 @@
         <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Scribe.Scanner\Scribe.Scanner.csproj" />
-    </ItemGroup>
-
     <Choose>
       <When Condition="'$(RuntimeIdentifier)' == ''">
         <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
