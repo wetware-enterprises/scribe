@@ -3,20 +3,22 @@ using Scribe.Memory.Reader;
 
 namespace Scribe.Memory.Image.Elf;
 
+// https://refspecs.linuxfoundation.org/elf/elf.pdf
+
 public class ElfReader(FileReader fr) {
 	public ElfHeader ReadHeader(nint baseAddr) {
 		var header = new ElfHeader();
 		
 		fr.Position = baseAddr;
-		header.Magic = fr.ReadUInt32();
+		header.Magic = fr.ReadUInt32(); // e_ident
 		fr.Seek(0x0C);
-		header.Type = fr.ReadUInt16();
+		header.Type = fr.ReadUInt16(); // e_type
 		fr.Seek(0x16);
-		header.ShOffset = (nint)fr.ReadUInt64();
+		header.ShOffset = (nint)fr.ReadUInt64(); // e_shoff
 		fr.Seek(0x0A);
-		header.ShEntrySize = fr.ReadUInt16();
-		header.ShNum = fr.ReadUInt16();
-		header.ShStrIndex = fr.ReadUInt16();
+		header.ShEntrySize = fr.ReadUInt16(); // e_shentsize
+		header.ShNum = fr.ReadUInt16(); // e_shnum
+		header.ShStrIndex = fr.ReadUInt16(); // e_shstrndx
 
 		var sections = this.ReadSections(
 			baseAddr,
@@ -47,14 +49,14 @@ public class ElfReader(FileReader fr) {
 			var section = new ElfSectionHeader();
 			
 			fr.Position = baseAddress + shOff + shEntSize * i;
-			section.NameIndex = fr.ReadUInt32();
-			section.Type = (ElfSectionType)fr.ReadUInt32();
+			section.NameIndex = fr.ReadUInt32(); // sh_name
+			section.Type = (ElfSectionType)fr.ReadUInt32(); // sh_type
 			fr.Seek(0x08);
-			section.Address = (nint)fr.ReadUInt64();
-			section.Offset = (nint)fr.ReadUInt64();
-			section.Size = fr.ReadUInt32();
+			section.Address = (nint)fr.ReadUInt64(); // sh_addr
+			section.Offset = (nint)fr.ReadUInt64(); // sh_offset
+			section.Size = fr.ReadUInt32(); // sh_size
 			fr.Seek(0x14);
-			section.EntrySize = fr.ReadUInt32();
+			section.EntrySize = fr.ReadUInt32(); // sh_entsize
 			
 			yield return section;
 		}
@@ -74,13 +76,13 @@ public class ElfReader(FileReader fr) {
 			var offset = baseAddress + dynSym.Offset + dynSym.EntrySize * i;
 			fr.Position = offset;
 			
-			var nameIdx = fr.ReadUInt32();
+			var nameIdx = fr.ReadUInt32(); // st_name
 			fr.Position = baseAddress + dynStr.Offset + nameIdx;
 			var name = fr.ReadCString();
 			if (name != symbolName) continue;
 			
 			fr.Position = offset + 8;
-			var addr = (nint)fr.ReadUInt64();
+			var addr = (nint)fr.ReadUInt64(); // st_value
 
 			symbol = new ElfSymbol {
 				NameIndex = nameIdx,

@@ -132,6 +132,9 @@ public class MemoryReader : MemoryReaderBase, IMemoryReaderImpl {
 		if (!pe.TryGetExportByName(baseAddr, dir, "mono_get_root_domain", out var addr))
 			return false;
 		
+		// 48 8B 05 [?? ?? ?? ??] C3
+		// 3 = asm pointer
+		// 7 = end of instruction
 		var asmPtr = addr + this.Read<int>(addr + 3) + 7;
 		return this.TryReadPtr(asmPtr, out gDomainPtr);
 	}
